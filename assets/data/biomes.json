@@ -1,0 +1,58 @@
+[
+  {
+    "id": "amber_dunes",
+    "name": "Amber Dunes",
+    "unlock_score": 0,
+    "sky_day_top": "#8cc8ff",
+    "sky_day_bottom": "#ffe4a8",
+    "sky_night_top": "#16233d",
+    "sky_night_bottom": "#23395b",
+    "horizon_day": "#f2b66d",
+    "horizon_night": "#445f87",
+    "ground_day": "#b68249",
+    "ground_night": "#5a4a43",
+    "accent": "#f4d26a"
+  },
+  {
+    "id": "cinder_wastes",
+    "name": "Cinder Wastes",
+    "unlock_score": 900,
+    "sky_day_top": "#fca17d",
+    "sky_day_bottom": "#6b3125",
+    "sky_night_top": "#1d1027",
+    "sky_night_bottom": "#31143d",
+    "horizon_day": "#8c4734",
+    "horizon_night": "#423460",
+    "ground_day": "#5a3027",
+    "ground_night": "#302431",
+    "accent": "#ff9c73"
+  },
+  {
+    "id": "aurora_reach",
+    "name": "Aurora Reach",
+    "unlock_score": 1800,
+    "sky_day_top": "#7dd4d4",
+    "sky_day_bottom": "#e7fff3",
+    "sky_night_top": "#10273c",
+    "sky_night_bottom": "#183d5d",
+    "horizon_day": "#94cba6",
+    "horizon_night": "#4877a6",
+    "ground_day": "#57855b",
+    "ground_night": "#314e49",
+    "accent": "#e1ff83"
+  },
+  {
+    "id": "cobalt_grid",
+    "name": "Cobalt Grid",
+    "unlock_score": 2700,
+    "sky_day_top": "#5ecbff",
+    "sky_day_bottom": "#d7efff",
+    "sky_night_top": "#081426",
+    "sky_night_bottom": "#122d4d",
+    "horizon_day": "#74a4df",
+    "horizon_night": "#1e4f82",
+    "ground_day": "#223853",
+    "ground_night": "#16263b",
+    "accent": "#79ffe1"
+  }
+]

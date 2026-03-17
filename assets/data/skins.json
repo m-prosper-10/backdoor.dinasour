@@ -1,0 +1,38 @@
+[
+  {
+    "id": "classic",
+    "name": "Classic Fossil",
+    "unlock_score": 0,
+    "body": "#d7ebad",
+    "accent": "#7eb36a",
+    "outline": "#1b2c22",
+    "eye": "#10120f"
+  },
+  {
+    "id": "ember",
+    "name": "Ember Runner",
+    "unlock_score": 800,
+    "body": "#ffb073",
+    "accent": "#f2664f",
+    "outline": "#371816",
+    "eye": "#fff4d2"
+  },
+  {
+    "id": "glacier",
+    "name": "Glacier Byte",
+    "unlock_score": 1600,
+    "body": "#c1f0ff",
+    "accent": "#5fb7ff",
+    "outline": "#163349",
+    "eye": "#0c1520"
+  },
+  {
+    "id": "neon",
+    "name": "Neon Fossil",
+    "unlock_score": 2400,
+    "body": "#a6ffb0",
+    "accent": "#ffef5d",
+    "outline": "#102015",
+    "eye": "#102015"
+  }
+]

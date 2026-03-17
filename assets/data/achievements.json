@@ -1,0 +1,44 @@
+[
+  {
+    "id": "rookie_survivor",
+    "name": "Rookie Survivor",
+    "description": "Reach 500 score in a single run.",
+    "type": "score",
+    "value": 500
+  },
+  {
+    "id": "coin_comet",
+    "name": "Coin Comet",
+    "description": "Collect 20 coins in one run.",
+    "type": "coins",
+    "value": 20
+  },
+  {
+    "id": "combo_ace",
+    "name": "Combo Ace",
+    "description": "Reach a coin streak of 6.",
+    "type": "streak",
+    "value": 6
+  },
+  {
+    "id": "night_owl",
+    "name": "Night Owl",
+    "description": "Stay alive long enough to hit the night cycle.",
+    "type": "flag",
+    "flag": "night_run"
+  },
+  {
+    "id": "wave_breaker",
+    "name": "Wave Breaker",
+    "description": "Finish a special challenge section.",
+    "type": "challenges",
+    "value": 1
+  },
+  {
+    "id": "safety_first",
+    "name": "Safety First",
+    "description": "Let a shield absorb a collision.",
+    "type": "flag",
+    "flag": "shield_save"
+  }
+]
