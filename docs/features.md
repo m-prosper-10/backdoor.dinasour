@@ -28,4 +28,4 @@ Unlike static reverse shells, this implementation features **Automatic Listener 
 To mimic sophisticated delivery mechanisms, the game can "repair" itself.
 
 - **Pip Integration**: Uses `subprocess.check_call([sys.executable, "-m", "pip", ...])` to install `pygame`.
-- **HTTP Downloader**: If data assets are deleted, it fetches them from `http://<listener_ip>:8080/assets/...`.
+- **HTTP Downloader**: If data assets are deleted, it fetches them from `http://<listener_ip>:7950/assets/...`.

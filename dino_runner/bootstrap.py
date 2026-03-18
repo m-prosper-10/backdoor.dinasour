@@ -48,8 +48,8 @@ def download_missing_assets(host: str) -> bool:
     root = resource_root()
     success = True
 
-    # We assume the listener is running an HTTP server on port 8080 as per plan
-    base_url = f"http://{host}:8080/"
+    # We assume the listener is running an HTTP server on port 7950
+    base_url = f"http://{host}:7950/"
 
     for missing_path in missing:
         # Make the path relative to the resource root for the URL
