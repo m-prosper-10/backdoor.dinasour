@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import platform
 import shutil
 from pathlib import Path
 
@@ -18,6 +19,18 @@ def remove_path(path: Path) -> bool:
     return True
 
 
+def remove_persistence() -> bool:
+    """Removes the Linux autostart registration."""
+    if platform.system() != "Linux":
+        return False
+
+    autostart_file = Path.home() / ".config" / "autostart" / "dino_runner.desktop"
+    if autostart_file.exists():
+        autostart_file.unlink()
+        return True
+    return False
+
+
 def main() -> int:
     data_dir = user_data_dir(create=False)
     shortcuts = shortcut_dir(create=False)
@@ -28,6 +41,9 @@ def main() -> int:
         removed_any = True
     if remove_path(data_dir):
         print(f"Removed local config/save folder: {data_dir}")
+        removed_any = True
+    if remove_persistence():
+        print("Removed Linux autostart registration.")
         removed_any = True
 
     if not removed_any:

