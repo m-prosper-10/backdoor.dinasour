@@ -112,7 +112,7 @@ class Game:
 
     def _update_cursor_visibility(self) -> None:
         focus_mode = bool(self.storage.settings.get("focus_mode", True))
-        hide = focus_mode and self.state in {"playing", "paused"}
+        hide = focus_mode and self.state == "playing"
         pygame.mouse.set_visible(not hide)
 
     def _queue_toast(self, title: str, body: str, *, duration: float = 3.2) -> None:
@@ -616,8 +616,10 @@ class Game:
             return
 
         if self.state == "paused":
-            if key in (pygame.K_ESCAPE, pygame.K_p):
+            if key == pygame.K_p:
                 self._resume()
+            elif key == pygame.K_ESCAPE:
+                self._return_menu()
             elif key == pygame.K_s:
                 self._open_settings()
             return

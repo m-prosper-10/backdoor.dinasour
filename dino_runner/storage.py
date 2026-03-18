@@ -39,10 +39,30 @@ class StorageManager:
         self._normalize()
 
     def _normalize(self) -> None:
-        if self.save_data["selected_skin"] not in self.save_data["unlocked_skins"]:
-            self.save_data["selected_skin"] = self.save_data["unlocked_skins"][0]
-        self.save_data["achievements"] = list(dict.fromkeys(self.save_data["achievements"]))
-        self.save_data["unlocked_skins"] = list(dict.fromkeys(self.save_data["unlocked_skins"]))
+        unlocked_skins = self.save_data.get("unlocked_skins", [])
+        if not isinstance(unlocked_skins, list):
+            unlocked_skins = []
+        unlocked_skins = [
+            skin_id
+            for skin_id in dict.fromkeys(unlocked_skins)
+            if isinstance(skin_id, str) and skin_id
+        ]
+        if not unlocked_skins:
+            unlocked_skins = [DEFAULT_SAVE_DATA["selected_skin"]]
+
+        achievements = self.save_data.get("achievements", [])
+        if not isinstance(achievements, list):
+            achievements = []
+        achievements = [
+            achievement_id
+            for achievement_id in dict.fromkeys(achievements)
+            if isinstance(achievement_id, str) and achievement_id
+        ]
+
+        self.save_data["unlocked_skins"] = unlocked_skins
+        self.save_data["achievements"] = achievements
+        if self.save_data.get("selected_skin") not in unlocked_skins:
+            self.save_data["selected_skin"] = unlocked_skins[0]
 
     def persist_settings(self) -> None:
         _write_json(settings_path(), self.settings)
