@@ -20,15 +20,22 @@ def remove_path(path: Path) -> bool:
 
 
 def remove_persistence() -> bool:
-    """Removes the Linux autostart registration."""
-    if platform.system() != "Linux":
-        return False
+    """Removes the Linux and macOS autostart registration."""
+    system = platform.system()
+    removed = False
 
-    autostart_file = Path.home() / ".config" / "autostart" / "dino_runner.desktop"
-    if autostart_file.exists():
-        autostart_file.unlink()
-        return True
-    return False
+    if system == "Linux":
+        autostart_file = Path.home() / ".config" / "autostart" / "dino_runner.desktop"
+        if autostart_file.exists():
+            autostart_file.unlink()
+            removed = True
+    elif system == "Darwin":
+        plist_path = Path.home() / "Library" / "LaunchAgents" / "com.dinorunner.deluxe.plist"
+        if plist_path.exists():
+            plist_path.unlink()
+            removed = True
+
+    return removed
 
 
 def main() -> int:

